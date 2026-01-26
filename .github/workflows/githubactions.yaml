@@ -1,0 +1,65 @@
+name: Build Image
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  PROJECT_ID: 
+  REGION: us-central1
+  REPOSITORY: idp-artifacts
+  IMAGE_NAME: hello-idp
+  GITOPS_REPO: smithddevon/idp-gitops
+
+jobs:
+  build:
+    runs-on: unbuntu-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Auth Google Cloud 
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.WIF_PROVDER }}
+          service_account: ${{ secrets.GCP_SA_EMAIL }}
+
+      - name: Configure Docker for Artifact Registry
+        run: |
+            gcloud auth configure-docker $REGION.docker.pkg.dev
+
+      - name: Build Docker Image
+        run: |
+            docker build -t $IMAGE_NAME .
+
+      - name: Tag Docker Image
+        run: |
+            docker tag $IMAGE_NAME \
+            $REGION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE_NAME:${{ github.sha }}
+
+      - name: Push Docker Image
+        run: |
+            docker push \
+            $REGION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE_NAME:${{ github.sha }}
+
+      - name: Checkout GitOps Repo 
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.GITOPS_REPO }}
+          token: ${{ secrets.GITOPS_TOKEN }}
+          path: gitops 
+
+      - name: Update Image Tag in Dev Overlay
+        run: |
+          cd gitops/apps/hello-idp/overlays/dev
+          kustomize edit set image hello-idp=$REGION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE_NAME:${{ github.sha }}
+
+      - name: Commit and push GitOps changes
+        run: |
+          cd gitops
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git commit -am "Update hello-idp image to ${{ github.sha }}"
+          git push 

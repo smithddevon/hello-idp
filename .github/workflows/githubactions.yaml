@@ -6,7 +6,7 @@ on:
       - main
 
 env:
-  PROJECT_ID: 
+  PROJECT_ID: internal-dev-platform
   REGION: us-central1
   REPOSITORY: idp-artifacts
   IMAGE_NAME: hello-idp

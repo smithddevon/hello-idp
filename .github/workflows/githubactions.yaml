@@ -5,6 +5,10 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+  id-token: write
+
 env:
   PROJECT_ID: internal-dev-platform
   REGION: us-central1
@@ -23,8 +27,11 @@ jobs:
       - name: Auth Google Cloud 
         uses: google-github-actions/auth@v2
         with:
-          workload_identity_provider: ${{ secrets.WIF_PROVDER }}
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
           service_account: ${{ secrets.GCP_SA_EMAIL }}
+
+      - name: Set up gcloud
+        uses: google-github-actions/setup-gcloud@v2
 
       - name: Configure Docker for Artifact Registry
         run: |

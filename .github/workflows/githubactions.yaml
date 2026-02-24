@@ -29,6 +29,9 @@ jobs:
         with:
           workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
           service_account: ${{ secrets.GCP_SA_EMAIL }}
+          token_format: access_token
+          create_credentials_file: true
+          export_environmental_variables: true
 
       - name: Set up gcloud
         uses: google-github-actions/setup-gcloud@v2

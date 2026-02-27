@@ -33,6 +33,9 @@ jobs:
           ACTIONS_ID_TOKEN_REQUEST_TOKEN: ${{ env.ACTIONS_ID_TOKEN_REQUEST_TOKEN }}
           ACTIONS_ID_TOKEN_REQUEST_URL: ${{ env.ACTIONS_ID_TOKEN_REQUEST_URL }}
 
+      - name: Debug GCP_SA_EMAIL
+        run: echo "Service account from secret:'${{ secrets.GCP_SA_EMAIL }}'"
+
 
       - name: Checkout Source Code
         uses: actions/checkout@v4
@@ -44,7 +47,7 @@ jobs:
           service_account: ${{ secrets.GCP_SA_EMAIL }}
           token_format: access_token
           create_credentials_file: true
-          export_environmental_variables: true
+          export_environment_variables: true
 
       - name: Set up gcloud
         uses: google-github-actions/setup-gcloud@v2

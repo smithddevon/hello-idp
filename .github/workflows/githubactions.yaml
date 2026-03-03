@@ -53,7 +53,7 @@ jobs:
 
       - name: Configure Docker for Artifact Registry
         run: |
-            gcloud auth configure-docker $REGION.docker.pkg.dev
+            gcloud auth configure-docker $REGION-docker.pkg.dev
 
       - name: Build Docker Image
         run: |

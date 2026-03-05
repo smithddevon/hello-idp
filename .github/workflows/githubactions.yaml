@@ -74,7 +74,8 @@ jobs:
         with:
           repository: ${{ env.GITOPS_REPO }}
           token: ${{ secrets.GITOPS_TOKEN }}
-          path: gitops 
+          path: gitops
+          persist-credentials: true
 
       - name: Update Image Tag in Dev Overlay
         run: |
